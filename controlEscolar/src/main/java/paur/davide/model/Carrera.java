@@ -11,6 +11,7 @@ public class Carrera {
         setNombre(nombre);
     }
 
+
     public int getId() {
         return id;
     }
@@ -26,4 +27,5 @@ public class Carrera {
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
+
 }
