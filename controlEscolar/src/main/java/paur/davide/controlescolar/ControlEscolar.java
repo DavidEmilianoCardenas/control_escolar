@@ -23,7 +23,7 @@ public class ControlEscolar {
     public static void main(String[] args) {
 
         Connection conexion = getConnection();
-        
+        menu();
         closeConnection(conexion);
     }
     
@@ -54,11 +54,12 @@ public class ControlEscolar {
     }
 
 
-    public void menu () {
-        System.out.println("Que quieres hacer?\n    0- Salir    \n1- Gestionar Carreras:");
+    public static void menu () {
+
         Scanner sc = new Scanner(System.in);
         boolean correctInput = false;
         while (!correctInput) {
+            System.out.println("Que quieres hacer?\n    0- Salir    \n1- Gestionar Carreras:");
             switch (sc.nextByte()) {
                 case 0:
                     correctInput = true;
@@ -74,7 +75,7 @@ public class ControlEscolar {
         sc.close();
     }
 
-    public void menuCarrera (Scanner sc) {
+    public static void menuCarrera (Scanner sc) {
         System.out.println("1- Añadir carrera\n2- Actualizar carrera\n3- Ver carreras\n 4-Borrar carrera");
         switch (sc.nextByte()) {
             case 1:
@@ -89,6 +90,8 @@ public class ControlEscolar {
                 System.out.println("Selecciona una de las opciones disponibles");
         }
     }
+
+
 
 
     public static void closeConnection(Connection con)
