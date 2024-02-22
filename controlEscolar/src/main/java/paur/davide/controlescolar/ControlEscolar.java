@@ -21,12 +21,18 @@ import javax.swing.JOptionPane;
 public class ControlEscolar {
 
     public static void main(String[] args) {
-        
 
-            try {
+        Connection conexion = getConnection();
+        
+        closeConnection(conexion);
+    }
+    
+    public static Connection getConnection()
+    {
+        try {
                 Properties props = new Properties();
                 props.load(new FileInputStream("config/db.properties"));
-                String username = props.getProperty("user");
+                String username = props.getProperty("username");
                 String password = props.getProperty("password");
                 String bd_name = props.getProperty("bd");
 
@@ -35,14 +41,16 @@ public class ControlEscolar {
                     Class.forName("com.mysql.cj.jdbc.Driver");
 
                     Connection conexion = DriverManager.getConnection(host, username, password);
-
-                    closeConnection(conexion);
+                    
+                    return conexion;
                 } catch (SQLException | ClassNotFoundException ex) {
                     System.out.println("Error en la conexion de la base de datos");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        
+        return null;
     }
 
 
