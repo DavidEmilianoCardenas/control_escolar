@@ -89,8 +89,15 @@ public class ControlEscolar {
             case 2:
                 break;
             case 3:
+                sc.nextLine();
+                getValues(con, "carreras");
                 break;
             case 4:
+                sc.nextLine();
+                System.out.println("Que carrera quieres borrar");
+                getValues(con, "carreras");
+                carr = sc.nextLine();
+                deleteCarrera("carreras", carr, con);
                 break;
             default:
                 System.out.println("Selecciona una de las opciones disponibles");
@@ -101,7 +108,6 @@ public class ControlEscolar {
     {
         try
         {
-            System.out.println("Entra al try");
             String Query = "INSERT INTO " + table_name + " (nombre) VALUES("
                     + "\"" + name +  "\")";
             
@@ -114,8 +120,41 @@ public class ControlEscolar {
         }
     }
 
+    public static void getValues(Connection conn, String table_name)
+    {
+        try
+        {
+            Connection conexion = conn;
+            String Query = "SELECT * FROM " + table_name;
+            Statement st = conexion.createStatement();
+            java.sql.ResultSet resultSet;
+            resultSet = st.executeQuery(Query);
+            
+            while(resultSet.next())
+            {
+                System.out.println("ID: " + resultSet.getString("id") + " | " +
+                    " Nombre: " + resultSet.getString("nombre"));
+            }
+        }catch (SQLException ex)
+        {
+            System.out.println("Error en la adquisición de datos");
+        }
+    }
 
-
+    public static void deleteCarrera(String table_name, String nombre, Connection con)
+    {
+        try
+        {
+            String Query = "DELETE FROM " + table_name + " WHERE nombre = \"" + nombre + "\"";
+            Statement st = con.createStatement();
+            st.executeUpdate(Query);
+        }catch(SQLException ex)
+        {
+            System.out.println(ex.getMessage());
+            JOptionPane.showMessageDialog(null, "Error borrando el registro especificado");
+        }
+    }
+    
     public static void closeConnection(Connection con)
     {
         try
