@@ -78,7 +78,10 @@ public class ControlEscolar {
     }
 
     public static void menuCarrera (Scanner sc, Connection con) {
-        System.out.println("1- Añadir carrera\n2- Actualizar carrera\n3- Ver carreras\n4-Borrar carrera");
+        System.out.println("MENU CARRERA\n   1- Añadir carrera\n" +
+                "   2- Actualizar carrera\n" +
+                "   3- Ver carreras\n" +
+                "   4-Borrar carrera");
         switch (sc.nextByte()) {
             case 1:
                 sc.nextLine();
