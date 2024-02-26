@@ -61,7 +61,7 @@ public class ControlEscolar {
         Scanner sc = new Scanner(System.in);
         boolean correctInput = false;
         while (!correctInput) {
-            System.out.println("Que quieres hacer?\n    0- Salir    \n1- Gestionar Carreras:");
+            System.out.println("Que quieres hacer?\n    0- Salir    \n      1- Gestionar Carreras:");
             switch (sc.nextByte()) {
                 case 0:
                     correctInput = true;
@@ -87,6 +87,12 @@ public class ControlEscolar {
                 InsertData("carreras", carr, con);
                 break;
             case 2:
+                sc.nextLine();
+                System.out.println("Que carrera quiere actualizar (Seleccione un numero)");
+                int idCarrera = sc.nextInt();
+                System.out.println("Elige el nuevo nombre de la carrera:");
+                String newName = sc.nextLine();
+                updateData("carreras",idCarrera,newName,con);
                 break;
             case 3:
                 break;
@@ -105,6 +111,23 @@ public class ControlEscolar {
             String Query = "INSERT INTO " + table_name + " (nombre) VALUES("
                     + "\"" + name +  "\")";
             
+            Statement st = con.createStatement();
+            System.out.println(Query);
+            st.executeUpdate(Query);
+        }catch (SQLException ex)
+        {
+            System.out.println(ex);
+        }
+    }
+
+    public static void updateData (String table_name, int id,String newName, Connection con) {
+        try
+        {
+            System.out.println("Entra al try");
+            String Query = "UPDATE " + table_name +
+                    " SET nombre = " +
+                    "\"" + newName +  "\")";
+
             Statement st = con.createStatement();
             System.out.println(Query);
             st.executeUpdate(Query);
