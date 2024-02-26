@@ -102,15 +102,15 @@ public class ControlEscolar {
         try
         {
             System.out.println("Entra al try");
-            String Query = "INSERT INTO " + table_name + " (name) VALUES("
-                    + "\'" + name +  "\');";
+            String Query = "INSERT INTO " + table_name + " (nombre) VALUES("
+                    + "\"" + name +  "\")";
             
             Statement st = con.createStatement();
             System.out.println(Query);
             st.executeUpdate(Query);
         }catch (SQLException ex)
         {
-            System.out.println("no va");
+            System.out.println(ex);
         }
     }
 
