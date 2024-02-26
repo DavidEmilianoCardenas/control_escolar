@@ -61,7 +61,7 @@ public class ControlEscolar {
         Scanner sc = new Scanner(System.in);
         boolean correctInput = false;
         while (!correctInput) {
-            System.out.println("Que quieres hacer?\n    0- Salir    \n      1- Gestionar Carreras:");
+            System.out.println("Que quieres hacer?\n    0- Salir    \n    1- Gestionar Carreras:");
             switch (sc.nextByte()) {
                 case 0:
                     correctInput = true;
@@ -78,7 +78,7 @@ public class ControlEscolar {
     }
 
     public static void menuCarrera (Scanner sc, Connection con) {
-        System.out.println("1- Añadir carrera\n2- Actualizar carrera\n3- Ver carreras\n 4-Borrar carrera");
+        System.out.println("1- Añadir carrera\n2- Actualizar carrera\n3- Ver carreras\n4-Borrar carrera");
         switch (sc.nextByte()) {
             case 1:
                 sc.nextLine();
@@ -89,14 +89,23 @@ public class ControlEscolar {
             case 2:
                 sc.nextLine();
                 System.out.println("Que carrera quiere actualizar (Seleccione un numero)");
+                getValues(con,"carreras");
                 int idCarrera = sc.nextInt();
+                sc.nextLine();
                 System.out.println("Elige el nuevo nombre de la carrera:");
                 String newName = sc.nextLine();
                 updateData("carreras",idCarrera,newName,con);
                 break;
             case 3:
+                sc.nextLine();
+                getValues(con, "carreras");
                 break;
             case 4:
+                sc.nextLine();
+                System.out.println("Que carrera quieres borrar");
+                getValues(con, "carreras");
+                carr = sc.nextLine();
+                deleteCarrera("carreras", carr, con);
                 break;
             default:
                 System.out.println("Selecciona una de las opciones disponibles");
@@ -107,7 +116,6 @@ public class ControlEscolar {
     {
         try
         {
-            System.out.println("Entra al try");
             String Query = "INSERT INTO " + table_name + " (nombre) VALUES("
                     + "\"" + name +  "\")";
             
@@ -126,7 +134,8 @@ public class ControlEscolar {
             System.out.println("Entra al try");
             String Query = "UPDATE " + table_name +
                     " SET nombre = " +
-                    "\"" + newName +  "\")";
+                    "\'" + newName +  "\' " +
+                    "WHERE id = " + id ;
 
             Statement st = con.createStatement();
             System.out.println(Query);
@@ -138,7 +147,41 @@ public class ControlEscolar {
     }
 
 
+    public static void getValues(Connection conn, String table_name)
+    {
+        try
+        {
+            Connection conexion = conn;
+            String Query = "SELECT * FROM " + table_name;
+            Statement st = conexion.createStatement();
+            java.sql.ResultSet resultSet;
+            resultSet = st.executeQuery(Query);
+            
+            while(resultSet.next())
+            {
+                System.out.println("ID: " + resultSet.getString("id") + " | " +
+                    " Nombre: " + resultSet.getString("nombre"));
+            }
+        }catch (SQLException ex)
+        {
+            System.out.println("Error en la adquisición de datos");
+        }
+    }
 
+    public static void deleteCarrera(String table_name, String nombre, Connection con)
+    {
+        try
+        {
+            String Query = "DELETE FROM " + table_name + " WHERE nombre = \"" + nombre + "\"";
+            Statement st = con.createStatement();
+            st.executeUpdate(Query);
+        }catch(SQLException ex)
+        {
+            System.out.println(ex.getMessage());
+            JOptionPane.showMessageDialog(null, "Error borrando el registro especificado");
+        }
+    }
+    
     public static void closeConnection(Connection con)
     {
         try
