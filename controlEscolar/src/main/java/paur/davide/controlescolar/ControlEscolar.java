@@ -61,13 +61,19 @@ public class ControlEscolar {
         Scanner sc = new Scanner(System.in);
         boolean correctInput = false;
         while (!correctInput) {
-            System.out.println("Que quieres hacer?\n    0- Salir    \n    1- Gestionar Carreras:");
+            System.out.println("Que quieres hacer?\n    0- Salir    \n    1- Gestionar Carreras:\n    2- Gestionar Alumnos:\n    3- Matricular Alumno:");
             switch (sc.nextByte()) {
                 case 0:
                     correctInput = true;
                     break;
                 case 1:
-                    menuCarrera(sc, con);
+                    menuEspecifico(sc, con, "carreras");
+                    break;
+                case 2:
+                    menuEspecifico(sc, con, "alumnos");
+                    break;
+                case 3:
+                    Matricular(sc, con);
                     break;
                 default:
                     System.out.println("Elige una de las opciones disponibles");
@@ -77,38 +83,38 @@ public class ControlEscolar {
         sc.close();
     }
 
-    public static void menuCarrera (Scanner sc, Connection con) {
-        System.out.println("MENU CARRERA\n   1- Añadir carrera\n" +
-                "   2- Actualizar carrera\n" +
-                "   3- Ver carreras\n" +
-                "   4-Borrar carrera");
+    public static void menuEspecifico (Scanner sc, Connection con, String bd_name) {
+        System.out.println("MENU " + bd_name.toUpperCase() +"\n   1- Añadir "+ bd_name+"\n" +
+                "   2- Actualizar "+ bd_name+"\n" +
+                "   3- Ver "+ bd_name+"\n" +
+                "   4- Borrar "+ bd_name+"");
         switch (sc.nextByte()) {
             case 1:
                 sc.nextLine();
-                System.out.println("Que carrera quieres añadir");
+                System.out.println("Que "+ bd_name+" quieres añadir");
                 String carr = sc.nextLine();
-                InsertData("carreras", carr, con);
+                InsertData(bd_name, carr, con);
                 break;
             case 2:
                 sc.nextLine();
-                System.out.println("Que carrera quiere actualizar (Seleccione un numero)");
-                getValues(con,"carreras");
+                System.out.println("Que "+ bd_name+" quiere actualizar (Seleccione un numero)");
+                getValues(con,bd_name);
                 int idCarrera = sc.nextInt();
                 sc.nextLine();
-                System.out.println("Elige el nuevo nombre de la carrera:");
+                System.out.println("Elige el nuevo nombre:");
                 String newName = sc.nextLine();
-                updateData("carreras",idCarrera,newName,con);
+                updateData(bd_name,idCarrera,newName,con);
                 break;
             case 3:
                 sc.nextLine();
-                getValues(con, "carreras");
+                getValues(con, bd_name);
                 break;
             case 4:
                 sc.nextLine();
-                System.out.println("Que carrera quieres borrar");
-                getValues(con, "carreras");
+                System.out.println("Que "+ bd_name+" quieres borrar");
+                getValues(con, bd_name);
                 carr = sc.nextLine();
-                deleteCarrera("carreras", carr, con);
+                deleteCarrera(bd_name, carr, con);
                 break;
             default:
                 System.out.println("Selecciona una de las opciones disponibles");
@@ -183,6 +189,109 @@ public class ControlEscolar {
             System.out.println(ex.getMessage());
             JOptionPane.showMessageDialog(null, "Error borrando el registro especificado");
         }
+    }
+    
+    public static void Matricular(Scanner sc, Connection con)
+    {
+        try
+        {
+            sc.nextLine();
+            //getValues(con, "alumnos");
+            System.out.println("Que alumno quiere matricular?");
+            String nombre = sc.nextLine();
+            
+            String Query = "SELECT * FROM alumnos";
+            
+            Statement st = con.createStatement();
+            java.sql.ResultSet resultSet;
+            resultSet = st.executeQuery(Query);
+            
+            int count = 0;
+            if(resultSet.last())
+            {
+                count = resultSet.getRow();
+                resultSet.beforeFirst();
+            }
+            
+            if(count > 0)
+            {
+                if(count > 1)
+                {
+                    boolean confirmed = false;
+                    short alumnoID = 0;
+                    do
+                    {
+                        while(resultSet.next())
+                        {
+                            System.out.println("ID: " + resultSet.getString("id") + " | " +
+                                " Nombre: " + resultSet.getString("nombre"));
+                        }
+                        System.out.println("Elija el alumno por su ID");
+                        alumnoID = sc.nextShort();
+                        sc.nextLine();
+                        
+                        
+                        while(resultSet.next())
+                        {
+                            if(resultSet.getShort("ID") == alumnoID)
+                            {
+                                confirmed = true;
+                                nombre = resultSet.getString("nombre");
+                            }
+                        }
+                        if(!confirmed)
+                        {
+                            System.out.println("ID equivocado");
+                        }
+                    }while(confirmed == false);
+                    
+                }
+                
+                MatricularNombre(nombre, sc, con);
+          }
+        }catch(SQLException ex)
+        {
+            System.out.println(ex.getMessage());
+            JOptionPane.showMessageDialog(null, "Error matriculando al alumno");
+        }
+    }
+    
+    public static void MatricularNombre(String nombre, Scanner sc, Connection con)
+    {
+        
+        try
+        {
+            String Query = "SELECT DISTINCT a.nombre, c.nombre FROM carreras c \n" +
+                "JOIN semestres s ON s.idCarreras = c.id \n" +
+                "JOIN materias m ON m.idSemestre = s.id\n" +
+                "JOIN alumnos_materias am ON am.idMaterias = m.id\n" +
+                "JOIN alumnos a ON am.idAlumnos = a.id WHERE a.nombre LIKE \"" + nombre +"\" GROUP BY c.nombre, a.nombre;";
+            
+            Statement st = con.createStatement();
+            java.sql.ResultSet resultSet;
+            resultSet = st.executeQuery(Query);
+            
+            int count = 0;
+            if(resultSet.last())
+            {
+                count = resultSet.getRow();
+                resultSet.beforeFirst();
+            }
+            
+            if(count > 0)
+            {
+                System.out.println("El alumno ya esta matriculado en una carrera");
+            }
+            else
+            {
+                System.out.println("Que carrera quiere cursar?");
+                getValues(con, "carreras");
+            }
+        }catch(SQLException ex)
+        {
+            System.out.println(ex.getMessage());
+            JOptionPane.showMessageDialog(null, "Error matriculando al alumno");
+        }   
     }
     
     public static void closeConnection(Connection con)
